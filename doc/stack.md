@@ -1,1 +1,4 @@
-a
+***Архитектура***
+
+![](images/architecture.jpg)
+
