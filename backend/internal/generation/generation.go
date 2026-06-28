@@ -1,23 +1,25 @@
 package generation
 
+//Егор: изменил генерацию рандома, поправил функцию
+
 import (
-	"math/rand"
 	"FLUX/internal/generation/payback"
 	"context"
-	_ "fmt"
+	"crypto/rand"
+	"math/big"
 )
 
 var numberToColor = map[int]string{
-	0: "green",
-	1: "red",
-	2: "black",
-	3: "red",
-	4: "black",
-	5: "red",
-	6: "black",
-	7: "red",
-	8: "black",
-	9: "red",
+	0:  "green",
+	1:  "red",
+	2:  "black",
+	3:  "red",
+	4:  "black",
+	5:  "red",
+	6:  "black",
+	7:  "red",
+	8:  "black",
+	9:  "red",
 	10: "black",
 	11: "black",
 	12: "red",
@@ -48,9 +50,8 @@ var numberToColor = map[int]string{
 }
 
 type Generator interface {
-    Generate(ctx context.Context) (payback.Payback, error)
+	Generate(ctx context.Context) (payback.Payback, error)
 }
-
 
 // func StartRoller(out chan<- payback.Payback) {
 // 	var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -65,15 +66,22 @@ type Generator interface {
 // 	}()
 // }
 
-type RouletteGenerator struct {
-    rng *rand.Rand
+type RouletteGenerator struct{}
+
+func NewRouletteGenerator() *RouletteGenerator {
+	return &RouletteGenerator{}
 }
 
-func (r *RouletteGenerator) Generate(ctx context.Context) payback.Payback {
-    num := r.rng.Intn(37)
+func (r *RouletteGenerator) Generate(ctx context.Context) (payback.Payback, error) {
+	n, err := rand.Int(rand.Reader, big.NewInt(37))
+	if err != nil {
+		return payback.Payback{}, err
+	}
 
-    return payback.Payback{
-        Number: num,
-        Color:  numberToColor[num],
-    }
+	num := int(n.Int64())
+
+	return payback.Payback{
+		Number: num,
+		Color:  numberToColor[num],
+	}, nil
 }
