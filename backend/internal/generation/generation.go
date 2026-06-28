@@ -3,13 +3,12 @@ package generation
 import (
 	"math/rand"
 	"FLUX/internal/generation/payback"
-	"time"
+	"context"
 	_ "fmt"
 )
 
 var numberToColor = map[int]string{
 	0: "green",
-
 	1: "red",
 	2: "black",
 	3: "red",
@@ -20,7 +19,6 @@ var numberToColor = map[int]string{
 	8: "black",
 	9: "red",
 	10: "black",
-
 	11: "black",
 	12: "red",
 	13: "black",
@@ -29,7 +27,6 @@ var numberToColor = map[int]string{
 	16: "red",
 	17: "black",
 	18: "red",
-
 	19: "red",
 	20: "black",
 	21: "red",
@@ -40,7 +37,6 @@ var numberToColor = map[int]string{
 	26: "black",
 	27: "red",
 	28: "black",
-
 	29: "black",
 	30: "red",
 	31: "black",
@@ -51,33 +47,33 @@ var numberToColor = map[int]string{
 	36: "red",
 }
 
-type RouletInter interface {
-	Start()
-	Roll() payback.Payback
+type Generator interface {
+    Generate(ctx context.Context) (payback.Payback, error)
 }
 
 
-func StartRoller() {
-	var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	go func() {
-		ticker := time.NewTicker(3 * time.Minute)
-		defer ticker.Stop()
+// func StartRoller(out chan<- payback.Payback) {
+// 	var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+// 	go func() {
+// 		ticker := time.NewTicker(3 * time.Minute)
+// 		defer ticker.Stop()
 
-		for {
-			Roll(rng)
-			<-ticker.C
-		}
-	}()
+// 		for {
+// 			out <- Roll(rng)
+// 			<-ticker.C
+// 		}
+// 	}()
+// }
+
+type RouletteGenerator struct {
+    rng *rand.Rand
 }
 
+func (r *RouletteGenerator) Generate(ctx context.Context) payback.Payback {
+    num := r.rng.Intn(37)
 
-func Roll(rng *rand.Rand) payback.Payback{
-	var pb payback.Payback
-
-	num := rng.Intn(37)
-	pb.Number = num
-	pb.Color = numberToColor[num]
-
-	return pb
+    return payback.Payback{
+        Number: num,
+        Color:  numberToColor[num],
+    }
 }
-
