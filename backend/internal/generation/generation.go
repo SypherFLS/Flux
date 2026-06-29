@@ -1,7 +1,5 @@
 package generation
 
-//Егор: изменил генерацию рандома, поправил функцию
-
 import (
 	"FLUX/internal/generation/payback"
 	"context"
