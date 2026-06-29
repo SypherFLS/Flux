@@ -7,19 +7,20 @@ import (
 )
 
 type EventType string
+
 const (
-    RoundStarted EventType = "round_started"
-    BetsClosed   EventType = "bets_closed"
-    RollFinished EventType = "roll_finished"
+	RoundStarted EventType = "round_started"
+	BetsClosed   EventType = "bets_closed"
+	RollFinished EventType = "roll_finished"
 )
 
 type Event struct {
-    Type EventType
-    Data any
+	Type EventType
+	Data any
 }
 
 type EventBus struct {
-	mu sync.RWMutex
+	mu          sync.RWMutex
 	subscribers map[EventType][]chan Event
 }
 
@@ -29,8 +30,8 @@ func NewEventBus() *EventBus {
 	}
 }
 
-//создаем канал под слушание ивента
-func (b *EventBus) Subscribe(eventType EventType) <-chan Event { 
+// создаем канал под слушание ивента
+func (b *EventBus) Subscribe(eventType EventType) <-chan Event {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
@@ -50,6 +51,10 @@ func (b *EventBus) Publish(event Event) {
 	defer b.mu.RUnlock()
 
 	for _, ch := range b.subscribers[event.Type] {
-		ch <- event
+		select {
+		case ch <- event:
+		default:
+			//Егор: канал переполнен - пропускаем
+		}
 	}
 }
