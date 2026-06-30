@@ -54,7 +54,7 @@ func (b *EventBus) Publish(event Event) {
 		select {
 		case ch <- event:
 		default:
-			//Егор: канал переполнен - пропускаем
+			
 		}
 	}
 }
